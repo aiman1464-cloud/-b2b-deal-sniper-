@@ -22,5 +22,5 @@ def run_server():
     server = HTTPServer(("0.0.0.0", port), SimpleHandler)
     server.serve_forever()
 
-# تشغيل خادم الويب في الخلفية حتى تقبل منصة Render الخدمة
-threading.Thread(target=run_server, daemon=True).start()
+if __name__ == "__main__":
+    run_server()
