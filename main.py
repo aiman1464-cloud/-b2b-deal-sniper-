@@ -8,7 +8,7 @@ import feedparser
 import requests
 from openai import OpenAI
 
-‎# ====== الإعدادات (تُضاف في Render > Environment) ======
+# ====== الإعدادات (تُضاف في Render > Environment) ======
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
@@ -17,7 +17,7 @@ MIN_SCORE = int(os.environ.get("MIN_SCORE", "7"))          # أقل تقييم �
 CHECK_EVERY_MIN = int(os.environ.get("CHECK_EVERY_MIN", "30"))
 MAX_PER_CYCLE = int(os.environ.get("MAX_PER_CYCLE", "12"))  # حد التحليل كل دورة (يوفر المال)
 
-‎# ====== المصادر: فرص، وظائف، مشاريع، أفكار، مشاكل ======
+# ====== المصادر: فرص، وظائف، مشاريع، أفكار، مشاكل ======
 FEEDS = [
     "https://hnrss.org/newest?points=60",
     "https://hnrss.org/whoishiring/jobs",
@@ -31,7 +31,7 @@ FEEDS = [
     "https://www.reddit.com/r/Entrepreneur/new/.rss",
     "https://www.reddit.com/r/SaaS/new/.rss",
 ]
-‎# مصادر حسب التخصص: ذكاء اصطناعي، برمجة، هندسة، عمل حر، أتمتة
+# مصادر حسب التخصص: ذكاء اصطناعي، برمجة، هندسة، عمل حر، أتمتة
 FEEDS += [
     "http://export.arxiv.org/rss/cs.AI",
     "https://hnrss.org/show",
@@ -48,7 +48,7 @@ FEEDS += [
     "https://www.reddit.com/r/engineering/new/.rss",
     "https://www.reddit.com/r/webdev/new/.rss",
 ]
-‎# مصادر Bug Bounty رسمية (تقارير وثغرات معلنة قانونياً) + صفحات توظيف عامة
+# مصادر Bug Bounty رسمية (تقارير وثغرات معلنة قانونياً) + صفحات توظيف عامة
 FEEDS += [
     "https://hackerone.com/hacktivity.rss",
     "https://www.bugcrowd.com/crowdstream/feed/",
@@ -58,28 +58,28 @@ FEEDS += [
     "https://remotive.com/remote-jobs/feed",
     "https://himalayas.app/jobs/rss",
 ]
-‎# مصادر إضافية (مناقصات، منح، الخ) افصل بينها بفاصلة في متغير EXTRA_FEEDS
+# مصادر إضافية (مناقصات، منح، الخ) افصل بينها بفاصلة في متغير EXTRA_FEEDS
 FEEDS += [u.strip() for u in os.environ.get("EXTRA_FEEDS", "").split(",") if u.strip()]
 
 SEEN_FILE = "seen.json"
 client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
 SYSTEM_PROMPT = (
-‎    "أنت مستشار فرص ذكي. تقيّم منشورات من الإنترنت وتبحث عن: "
-‎    "فرص دخل، مشاكل حقيقية يمكن حلها بمنتج أو خدمة، شراكات في الذكاء الاصطناعي، "
-‎    "وظائف أو عمل حر عن بعد، مناقصات ومنح، وثغرات سوق صغيرة يمكن استغلالها. "
-‎    "في أي تخصص (برمجة، هندسة، أتمتة، تصميم، ذكاء اصطناعي، تسويق، غيرها). "
-‎    "يشمل برامج Bug Bounty الرسمية المعلنة (HackerOne, Bugcrowd) وصفحات توظيف عامة فقط، "
-‎    "ولا تقترح أبداً أي اختراق أو وصول غير مصرّح به. "
-‎    "فكّر كمهندس وقناص: ما أسرع طريقة لبناء حل بسيط وبيعه أو التقديم قبل غيري؟ "
-‎    "ردّ بـ JSON فقط بهذه المفاتيح: "
+    "أنت مستشار فرص ذكي. تقيّم منشورات من الإنترنت وتبحث عن: "
+    "فرص دخل، مشاكل حقيقية يمكن حلها بمنتج أو خدمة، شراكات في الذكاء الاصطناعي، "
+    "وظائف أو عمل حر عن بعد، مناقصات ومنح، وثغرات سوق صغيرة يمكن استغلالها. "
+    "في أي تخصص (برمجة، هندسة، أتمتة، تصميم، ذكاء اصطناعي، تسويق، غيرها). "
+    "يشمل برامج Bug Bounty الرسمية المعلنة (HackerOne, Bugcrowd) وصفحات توظيف عامة فقط، "
+    "ولا تقترح أبداً أي اختراق أو وصول غير مصرّح به. "
+    "فكّر كمهندس وقناص: ما أسرع طريقة لبناء حل بسيط وبيعه أو التقديم قبل غيري؟ "
+    "ردّ بـ JSON فقط بهذه المفاتيح: "
     "score (رقم 1 إلى 10)، type (نوع الفرصة بكلمتين)، "
     "why (سبب بسطر واحد بالعربي)، action (أول خطوة عملية بسطر واحد بالعربي). "
-‎    "كن صارماً: أعطِ 7 فأكثر فقط للفرص الحقيقية والقابلة للتنفيذ."
+    "كن صارماً: أعطِ 7 فأكثر فقط للفرص الحقيقية والقابلة للتنفيذ."
 )
 
 
-‎# ====== سيرفر صغير ليبقى Render شغالاً ======
+# ====== سيرفر صغير ليبقى Render شغالاً ======
 class SimpleHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -101,7 +101,7 @@ def run_server():
     server.serve_forever()
 
 
-‎# ====== أدوات ======
+# ====== أدوات ======
 def load_seen():
     try:
         with open(SEEN_FILE, "r") as f:
@@ -118,7 +118,7 @@ def save_seen(seen):
         pass
 
 
-‎# ====== خصوصية: الإرسال يذهب فقط لحسابك الخاص (Chat ID واحد)، ولا طباعة لأي مفتاح سري ======
+# ====== خصوصية: الإرسال يذهب فقط لحسابك الخاص (Chat ID واحد) ======
 def send_telegram(text):
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
         print("Telegram غير مضبوط (لم تتم طباعة أي مفتاح)")
@@ -194,7 +194,7 @@ def run_cycle(seen):
                 f"👉 {result.get('action', '')}\n\n"
                 f"{item['link']}"
             )
-‎    # الباقي نعلّمه مقروءاً حتى لا يتراكم
+    # الباقي نعلّمه مقروءاً حتى لا يتراكم
     for item in items[MAX_PER_CYCLE:]:
         seen.add(item["key"])
     save_seen(seen)
