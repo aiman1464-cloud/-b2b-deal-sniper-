@@ -1,10 +1,10 @@
 import os
 import time
+import threading
 import requests
 import feedparser
 from openai import OpenAI
 from flask import Flask
-from threading import Thread
 
 # 1. التكوين الأساسي للسيادة والتشغيل
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
@@ -20,6 +20,9 @@ def home():
     return "Sovereign AI Enterprise Core System is LIVE and Fully Operational."
 
 def send_telegram(text):
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        print("Telegram tokens are missing.")
+        return
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {"chat_id": TELEGRAM_CHAT_ID, "text": text, "parse_mode": "Markdown"}
     try:
@@ -30,8 +33,8 @@ def send_telegram(text):
 def autonomous_enterprise_engine():
     """محرك المنظومة المستقل: رصد، تحليل بحت، وتنفيذ آلي"""
     print("Autonomous Enterprise Engine started...")
+    time.sleep(5)  # انتظار قليل حتى يستقر السيرفر
     
-    # رسالة بدء تشغيل المنظومة كمنظمة مستقلة
     startup_msg = (
         "🏢 **[تشغيل منظومة الأعمال السيادية]**\n\n"
         "⚡ تم تفعيل فريق الوكلاء الذكيين بنجاح.\n"
@@ -56,7 +59,6 @@ def autonomous_enterprise_engine():
                     if entry.link not in seen_links:
                         seen_links.add(entry.link)
                         
-                        # وكيل التحليل البحت (Analyst Agent)
                         ai_prompt = (
                             "أنت وكيل التحليل الاستراتيجي الأعلى في منظومة أعمال سيادية. "
                             "قم بتحليل الفرصة التالية تحليلاً بحتاً وصارماً:\n"
@@ -74,7 +76,6 @@ def autonomous_enterprise_engine():
                         )
                         analysis_result = res.choices[0].message.content
                         
-                        # التقرير التنفيذي النهائي الموجه لك على تيليجرام
                         enterprise_report = (
                             "🎯 **[فرصة جديدة رصدتها المنظومة]**\n\n"
                             f"📌 **المشروع:** {entry.title}\n"
@@ -87,13 +88,16 @@ def autonomous_enterprise_engine():
             except Exception as e:
                 print(f"Error in enterprise loop: {e}")
                 
-        # فترة استراحة بين عمليات الفحص المتكررة للحفاظ على استقرار السيرفر
         time.sleep(300)
 
-if __name__ == "__main__":
-    t = Thread(target=autonomous_enterprise_engine)
+# تشغيل محرك الخلفية عند الإقلاع
+def start_background_engine():
+    t = threading.Thread(target=autonomous_enterprise_engine)
     t.daemon = True
     t.start()
-    
+
+start_background_engine()
+
+if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
