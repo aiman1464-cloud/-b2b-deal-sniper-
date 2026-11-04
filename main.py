@@ -6,7 +6,7 @@ from openai import OpenAI
 from flask import Flask
 from threading import Thread
 
-# 1. Configuration
+# 1. التكوين الأساسي للسيادة والتشغيل
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
@@ -17,7 +17,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "Sovereign AI Enterprise System is LIVE and Active."
+    return "Sovereign AI Enterprise Core System is LIVE and Fully Operational."
 
 def send_telegram(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
@@ -27,42 +27,21 @@ def send_telegram(text):
     except Exception as e:
         print(f"Error sending Telegram message: {e}")
 
-def run_instant_test():
-    """توليد تجربة حية فورية لرؤية تحليل الذكاء الاصطناعي ورابط بايبال"""
-    print("Executing instant diagnostic test...")
-    prompt = """
-    أنت وكيل تحليل سيادي متقدم (Sovereign AI Analyst). 
-    قم بإنشاء مثال حي وتكتيكي لصفقة/فرصة عمل رقمية عالية الربحية (B2B Arbitrage or High-Value Job).
-    قدم التحليل بالشكل التالي:
-    - 📌 عنوان الفرصة
-    - 💡 التحليل التكتيكي وهامش الربح المتوقع
-    - ⚡ خطة التنفيذ الذاتية
-    """
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=300
-        )
-        analysis = response.choices[0].message.content
-        
-        message = (
-            "🚀 **[اختبار تشغيلي حي - إثبات كفاءة المنظومة]**\n\n"
-            f"{analysis}\n\n"
-            f"💳 **رابط تحصيل الأرباح المباشر:**\n{PAYPAL_LINK}\n\n"
-            "STATUS: المنظومة تعمل الآن بكامل طاقتها وتراقب الأسواق 24/7."
-        )
-        send_telegram(message)
-        print("Instant test sent to Telegram successfully.")
-    except Exception as e:
-        print(f"Test failed: {e}")
-
-def monitor_loop():
-    # تشغيل الاختبار الفوري مرة واحدة عند الإقلاع لرؤية النتيجة مباشرة
-    time.sleep(5)
-    run_instant_test()
+def autonomous_enterprise_engine():
+    """محرك المنظومة المستقل: رصد، تحليل بحت، وتنفيذ آلي"""
+    print("Autonomous Enterprise Engine started...")
     
-    # الحلقة الدائمة للمراقبة
+    # رسالة بدء تشغيل المنظومة كمنظمة مستقلة
+    startup_msg = (
+        "🏢 **[تشغيل منظومة الأعمال السيادية]**\n\n"
+        "⚡ تم تفعيل فريق الوكلاء الذكيين بنجاح.\n"
+        "🔍 الرصد المستمر للأسواق والفرص: **نشط (24/7)**\n"
+        "📊 التحليل المالي والاستراتيجي: **جاهز**\n"
+        "💳 تحصيل الأرباح الآلي: **مربوط**\n\n"
+        f"🔗 رابط التحصيل المعتمد:\n{PAYPAL_LINK}"
+    )
+    send_telegram(startup_msg)
+
     seen_links = set()
     feed_urls = [
         "https://weworkremotely.com/remote-jobs.rss",
@@ -73,33 +52,46 @@ def monitor_loop():
         for url in feed_urls:
             try:
                 feed = feedparser.parse(url)
-                for entry in feed.entries[:3]:
+                for entry in feed.entries[:2]:
                     if entry.link not in seen_links:
                         seen_links.add(entry.link)
                         
-                        # تحليل الفرصة عبر GPT-4o-mini
-                        ai_prompt = f"حلل الفرصة التالية باختصار واذكر كيف يمكن الاستفادة منها تجارياً:\nالعنوان: {entry.title}\nالرابط: {entry.link}"
+                        # وكيل التحليل البحت (Analyst Agent)
+                        ai_prompt = (
+                            "أنت وكيل التحليل الاستراتيجي الأعلى في منظومة أعمال سيادية. "
+                            "قم بتحليل الفرصة التالية تحليلاً بحتاً وصارماً:\n"
+                            f"العنوان: {entry.title}\n"
+                            f"الرابط: {entry.link}\n\n"
+                            "حدد باختصار شديد:\n"
+                            "1. قيمة الفرصة وهامش الربح.\n"
+                            "2. خطوة التنفيذ الفورية."
+                        )
+                        
                         res = client.chat.completions.create(
                             model="gpt-4o-mini",
                             messages=[{"role": "user", "content": ai_prompt}],
-                            max_tokens=200
+                            max_tokens=250
                         )
-                        ai_analysis = res.choices[0].message.content
+                        analysis_result = res.choices[0].message.content
                         
-                        alert = (
-                            f"🎯 **فرصة جديدة مكتشفة!**\n\n"
-                            f"**العنوان:** {entry.title}\n"
-                            f"**الرابط:** {entry.link}\n\n"
-                            f"📊 **تحليل الذكاء الاصطناعي:**\n{ai_analysis}\n\n"
-                            f"💳 **رابط الإيداع والدفع:**\n{PAYPAL_LINK}"
+                        # التقرير التنفيذي النهائي الموجه لك على تيليجرام
+                        enterprise_report = (
+                            "🎯 **[فرصة جديدة رصدتها المنظومة]**\n\n"
+                            f"📌 **المشروع:** {entry.title}\n"
+                            f"🔗 **الرابط:** {entry.link}\n\n"
+                            f"📊 **تقرير التحليل البحت:**\n{analysis_result}\n\n"
+                            f"💳 **بوابة تحصيل العوائد والأرباح:**\n{PAYPAL_LINK}"
                         )
-                        send_telegram(alert)
+                        send_telegram(enterprise_report)
+                        
             except Exception as e:
-                print(f"Error in monitor loop: {e}")
+                print(f"Error in enterprise loop: {e}")
+                
+        # فترة استراحة بين عمليات الفحص المتكررة للحفاظ على استقرار السيرفر
         time.sleep(300)
 
 if __name__ == "__main__":
-    t = Thread(target=monitor_loop)
+    t = Thread(target=autonomous_enterprise_engine)
     t.daemon = True
     t.start()
     
