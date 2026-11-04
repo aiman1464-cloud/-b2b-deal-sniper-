@@ -2,123 +2,106 @@ import os
 import time
 import requests
 import feedparser
-import telebot
 from openai import OpenAI
-from flask import Flask, request, jsonify
-import threading
+from flask import Flask
+from threading import Thread
 
-# 1. تهيئة المفاتيح والبيئة للتشغيل السيادي المستقل
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# 1. Configuration
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+PAYPAL_LINK = "https://www.paypal.com/ncp/payment/S4WAPDVFEC75Y"
 
-bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN)
-ai_client = OpenAI(api_key=OPENAI_API_KEY)
+client = OpenAI(api_key=OPENAI_API_KEY)
 app = Flask(__name__)
 
-# رابط بايبال الخاص بك المعتمد للاستقبال المالي
-PAYPAL_PAYMENT_LINK = "https://www.paypal.com/ncp/payment/S4WAPDVFEC75Y"
+@app.route('/')
+def home():
+    return "Sovereign AI Enterprise System is LIVE and Active."
 
-# مصادر رصد الفرص والتغيرات (Arbitrage, Deals, Price Shifts)
-GLOBAL_TARGET_SOURCES = [
-    "https://www.slickdeals.net/newsearch.php?mode=popdeals&searchtech=gnu&f=rss",
-    # أضف أي مصادر إضافية هنا لاستهداف أسواق ومجالات أخرى
-]
+def send_telegram(text):
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": text, "parse_mode": "Markdown"}
+    try:
+        requests.post(url, json=payload)
+    except Exception as e:
+        print(f"Error sending Telegram message: {e}")
 
-seen_targets = set()
-
-def analyze_opportunity_autonomously(title, description, link):
-    """
-    الوكيل الذكي للتحليل الفوري وتحديد كيفية استغلال الفرصة وتحويلها لدخل
-    """
-    prompt = f"""
-    أنت العقل التنفيذي لمنظومة وكلاء ذكاء اصطناعي سيادية مستقلة.
-    حلل الهدف التالي بدقة تامة:
-    العنوان: {title}
-    التفاصيل: {description}
-    الرابط: {link}
-
-    المطلوب:
-    1. ما هي نوعية الفرصة أو التغير المالي (استغلال سعر، أرباح سريعة، أو صفقة)؟
-    2. كيف يمكن تحويل هذه الفرصة إلى دخل حقيقي فوري؟
-
-    أجب باختصار شديد ومباشر:
-    - الأهمية والربحية: (عالية جداً / متوسطة)
-    - التكتيك التنفيذي: (سطر واحد يوضح خطوة الاستغلال الآلي)
+def run_instant_test():
+    """توليد تجربة حية فورية لرؤية تحليل الذكاء الاصطناعي ورابط بايبال"""
+    print("Executing instant diagnostic test...")
+    prompt = """
+    أنت وكيل تحليل سيادي متقدم (Sovereign AI Analyst). 
+    قم بإنشاء مثال حي وتكتيكي لصفقة/فرصة عمل رقمية عالية الربحية (B2B Arbitrage or High-Value Job).
+    قدم التحليل بالشكل التالي:
+    - 📌 عنوان الفرصة
+    - 💡 التحليل التكتيكي وهامش الربح المتوقع
+    - ⚡ خطة التنفيذ الذاتية
     """
     try:
-        response = ai_client.chat.completions.create(
+        response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=150
+            max_tokens=300
         )
-        return response.choices[0].message.content.strip()
+        analysis = response.choices[0].message.content
+        
+        message = (
+            "🚀 **[اختبار تشغيلي حي - إثبات كفاءة المنظومة]**\n\n"
+            f"{analysis}\n\n"
+            f"💳 **رابط تحصيل الأرباح المباشر:**\n{PAYPAL_LINK}\n\n"
+            "STATUS: المنظومة تعمل الآن بكامل طاقتها وتراقب الأسواق 24/7."
+        )
+        send_telegram(message)
+        print("Instant test sent to Telegram successfully.")
     except Exception as e:
-        return f"Analysis error: {e}"
+        print(f"Test failed: {e}")
 
-def autonomous_sniper_engine():
-    """
-    محرك الصيد السيادي المستقل (يعمل 24/7 بدون تدخل بشري)
-    """
-    while True:
-        try:
-            print("🚀 المنظومة السيادية تمسح الأسواق والفرص بشكل آلي...")
-            for source in GLOBAL_TARGET_SOURCES:
-                feed = feedparser.parse(source)
-                for entry in feed.entries[:5]:
-                    target_id = entry.get("id", entry.link)
-                    if target_id in seen_targets:
-                        continue
-                    seen_targets.add(target_id)
-                    
-                    title = entry.title
-                    link = entry.link
-                    description = entry.get("summary", "")
-                    
-                    tactical_report = analyze_opportunity_autonomously(title, description, link)
-                    
-                    # إرسال التنبيه مرفقاً برابط الدفع المباشر الخاص بك
-                    alert_msg = (
-                        f"🎯 **[Sovereign Autonomous System] هدف تم رصده!**\n\n"
-                        f"📌 **الفرصة:** {title}\n"
-                        f"🔗 **رابط الفرصة:** {link}\n\n"
-                        f"📊 **التقرير التكتيكي:**\n{tactical_report}\n\n"
-                        f"💳 **رابط الدفع الفوري (PayPal):**\n{PAYPAL_PAYMENT_LINK}"
-                    )
-                    if TELEGRAM_CHAT_ID:
-                        bot.send_message(TELEGRAM_CHAT_ID, alert_msg, parse_mode="Markdown")
-        except Exception as e:
-            print(f"Error in autonomous engine loop: {e}")
-        time.sleep(180) # فحص مستمر كل 3 دقائق
-
-@app.route('/payment-incoming', methods=['POST'])
-def payment_incoming():
-    """
-    بوابة استقبال الأموال فقط (دخول مالي بحت وأمان تام دون أي صلاحية سحب)
-    """
-    data = request.json or request.form.to_dict()
-    amount = data.get('mc_gross', '0.00')
-    currency = data.get('mc_currency', 'USD')
-    payer = data.get('payer_email', 'External Client')
+def monitor_loop():
+    # تشغيل الاختبار الفوري مرة واحدة عند الإقلاع لرؤية النتيجة مباشرة
+    time.sleep(5)
+    run_instant_test()
     
-    msg = (
-        f"💰 **تأكيد دخول أموال لحسابك!**\n\n"
-        f"💵 المبلغ الوارد: {amount} {currency}\n"
-        f"👤 المصدر: {payer}\n"
-        f"🔒 (الحالة: تم إيداع الأموال بنجاح في حسابك - أمان كامل ودخول فقط)."
-    )
-    if TELEGRAM_CHAT_ID:
-        bot.send_message(TELEGRAM_CHAT_ID, msg, parse_mode="Markdown")
-    return jsonify({"status": "received"}), 200
-
-@bot.message_handler(commands=['start', 'status'])
-def send_status(message):
-    bot.reply_to(message, "⚡ **المنظومة السيادية تعمل بكامل طاقتها الاستقلالية، ورابط بايبال مرتبط وجاهز.**")
+    # الحلقة الدائمة للمراقبة
+    seen_links = set()
+    feed_urls = [
+        "https://weworkremotely.com/remote-jobs.rss",
+        "https://remoteok.com/index.xml"
+    ]
+    
+    while True:
+        for url in feed_urls:
+            try:
+                feed = feedparser.parse(url)
+                for entry in feed.entries[:3]:
+                    if entry.link not in seen_links:
+                        seen_links.add(entry.link)
+                        
+                        # تحليل الفرصة عبر GPT-4o-mini
+                        ai_prompt = f"حلل الفرصة التالية باختصار واذكر كيف يمكن الاستفادة منها تجارياً:\nالعنوان: {entry.title}\nالرابط: {entry.link}"
+                        res = client.chat.completions.create(
+                            model="gpt-4o-mini",
+                            messages=[{"role": "user", "content": ai_prompt}],
+                            max_tokens=200
+                        )
+                        ai_analysis = res.choices[0].message.content
+                        
+                        alert = (
+                            f"🎯 **فرصة جديدة مكتشفة!**\n\n"
+                            f"**العنوان:** {entry.title}\n"
+                            f"**الرابط:** {entry.link}\n\n"
+                            f"📊 **تحليل الذكاء الاصطناعي:**\n{ai_analysis}\n\n"
+                            f"💳 **رابط الإيداع والدفع:**\n{PAYPAL_LINK}"
+                        )
+                        send_telegram(alert)
+            except Exception as e:
+                print(f"Error in monitor loop: {e}")
+        time.sleep(300)
 
 if __name__ == "__main__":
-    # تشغيل محرك الصيد في الخلفية المستقلة
-    threading.Thread(target=autonomous_sniper_engine, daemon=True).start()
+    t = Thread(target=monitor_loop)
+    t.daemon = True
+    t.start()
     
-    # تشغيل سيرفر الويب على Render للعمل المستمر واستقبال إشعارات الدخول المالي
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
