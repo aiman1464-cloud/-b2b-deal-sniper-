@@ -93,6 +93,15 @@ def autonomous_enterprise_engine():
         time.sleep(300)
 
 def handle_commands():
+    # حذف أي Webhook قديم حتى يعمل getUpdates
+    try:
+        requests.get(
+            f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/deleteWebhook",
+            timeout=20,
+        )
+    except Exception as e:
+        print(f"deleteWebhook error: {e}")
+
     offset = None
     while True:
         try:
