@@ -10,135 +10,132 @@ app = Flask(__name__)
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "9278867399:AAEYJ20caO4-EsQC_nMUtgxocBuHZUozqV8")
 PAYPAL_LINK = "https://www.paypal.com/ncp/payment/S4WAPDVFEC75Y"
 
-# قائمة أفضل 50 وكيل ذكاء اصطناعي لبيئة الأعمال (Top 50 AI Agents)
-TOP_50_AGENTS = [
-    {"name": "Devin AI", "field": "تطوير وبرمجة كاملة (First AI Software Engineer)"},
-    {"name": "AutoGPT", "field": "وكيل مهام ذاتية وتخطيط معقد"},
-    {"name": "BabyAGI", "field": "إدارة وترتيب المهام الأوتوماتيكية"},
-    {"name": "AgentGPT", "field": "وكيل متصفح وأبحاث مستقلة"},
-    {"name": "CrewAI", "field": "إدارة فرق العمل المتعددة من الوكلاء"},
-    {"name": "ChatDev", "field": "تطوير البرمجيات عبر فريق وهمي ذكي"},
-    {"name": "MetaGPT", "field": "تحويل المتطلبات إلى مخططات وكود متكامل"},
-    {"name": "LangChain Agents", "field": "ربط أدوات وسلاسل البيانات المعقدة"},
-    {"name": "Fixie.ai", "field": "وكلاء محادثات الأعمال المباشرة"},
-    {"name": "Adept ACT-1", "field": "أتمتة برامج الكومبيوتر والمجالات المكتبية"},
-    {"name": "MultiOn", "field": "وكيل إجراء المعاملات وحجز التذاكر بالمتصفح"},
-    {"name": "LlamaIndex Agents", "field": "استعلام وتحليل البيانات الضخمة"},
-    {"name": "Zapier Central", "field": "أتمتة آلاف التطبيقات اليومية بذكاء"},
-    {"name": "Cognosys", "field": "وكيل تنفيذ أبحاث السوق المعقدة"},
-    {"name": "HyperWrite Personal Assistant", "field": "أتمتة الأعمال المكتبية والايميلات"},
-    {"name": "Microsoft Copilot Studio", "field": "بناء وكلاء مخصصين للمؤسسات"},
-    {"name": "OpenAI Custom GPTs", "field": "وكلاء مخصصون للمهام التفاعلية"},
-    {"name": "Semantic Kernel Agents", "field": "وكلاء متكاملون لبيئات دوت نت وبايثون"},
-    {"name": "Superagi", "field": "منصة إشراف وتطوير الوكلاء الذاتيين"},
-    {"name": "AgentOps", "field": "مراقبة واختبار أداء وكلاء الذكاء الاصطناعي"},
-    {"name": "Camel AI", "field": "محاكاة التفاعل والتفاوض بين وكيلين"},
-    {"name": "Syllable AI", "field": "وكلاء الرعاية الصحية والجداول العيادية"},
-    {"name": "FinGPT", "field": "تحليل الأسواق المالية والتداول الذكي"},
-    {"name": "Phidata", "field": "بناء وكلاء مدعومين بنماذج الـ LLM مع قاعدة بيانات"},
-    {"name": "Replicate Agent", "field": "تشغيل نماذج الذكاء الاصطناعي بالهواء"},
-    {"name": "Taskweaver", "field": "وكيل مايكروسوفت لتخطيط وتحليل كود بايثون"},
-    {"name": "Kore.ai", "field": "وكلاء خدمات العملاء في الشركات الكبرى"},
-    {"name": "Yellow.ai", "field": "وكيل المحادثات والمبيعات الذكية 24/7"},
-    {"name": "Sierra AI", "field": "خدمة العملاء عالية المستوى للماركات العالمية"},
-    {"name": "Decagon", "field": "دعم فني وأتمتة شكاوى وتذاكر المستخدمين"},
-    {"name": "Intercom Fin AI", "field": "حلال المشاكل التلقائي للعملاء"},
-    {"name": "Lindy AI", "field": "سكرتير شخصي لإدارة المواعيد والبريد"},
-    {"name": "Granola AI", "field": "مساعد الاجتماعات وتلخيص القرارات والتوصيات"},
-    {"name": "Otter.ai Agent", "field": "تسجيل وتلخيص ومتابعة مهام الاجتماعات الحية"},
-    {"name": "Fireflies.ai", "field": "تحليل مكالمات المبيعات والاجتماعات"},
-    {"name": "Clay AI", "field": "إثراء واستخراج بيانات العملاء المحتملين (B2B Lead Generation)"},
-    {"name": "Seamless.ai", "field": "صياد بيانات وأرقام متخذي القرار في الشركات"},
-    {"name": "Apollo AI Agent", "field": "أتمتة حملات المبيعات والتواصل البارد (Cold Outreach)"},
-    {"name": "Kasisto", "field": "وكيل الخدمات المصرفية والمالية"},
-    {"name": "UiPath Autopilot", "field": "أتمتة العمليات المكررة في الشركات (RPA + AI)"},
-    {"name": "Automation Anywhere Enterprise Agent", "field": "إدارة سير العمل المؤسسي"},
-    {"name": "Glean AI", "field": "محرك البحث والوكيل الداخلي لمعلومات الشركة"},
-    {"name": "Dust.tt", "field": "مساعد مخصص لفريق العمل الداخلي"},
-    {"name": "Scribe AI", "field": "وكيل توثيق الأدلة والشروحات الخطوة بخطوة"},
-    {"name": "Synthesia AI Agent", "field": "توليد فيديوهات التدريب والتقديم فورياً"},
-    {"name": "HeyGen Interactive Avatar", "field": "وكيل فيديو تفاعلي يجيب على العملاء"},
-    {"name": "Harvey AI", "field": "مساعد ووكيل القضايا والعقود القانونية"},
-    {"name": "CoCounsel (Thomson Reuters)", "field": "صياد ومحلل المراجع والأحكام القانونية"},
-    {"name": "Abacus.ai", "field": "أنظمة التنبؤ والتوصية الذكية للمتاجر"},
-    {"name": "B2B Snipe Agent", "field": "وكيلك الحالي لرصد الفرص وتسهيل عمليات الدفع والتسويق"}
+# صفوة الصفوة - أفضل 10 وكلاء ذكاء اصطناعي في العالم (Top 10 Elite Agents)
+TOP_10_AGENTS = [
+    {"name": "1. Devin AI", "field": "أول مهندس برمجيات ذكاء اصطناعي مستقل بالكامل"},
+    {"name": "2. AutoGPT", "field": "وكيل التخطيط الذاتي والمهام المركبة دون تدخل بشري"},
+    {"name": "3. CrewAI", "field": "إدارة وتشغيل فرق كاملة من وكلاء الذكاء الاصطناعي"},
+    {"name": "4. Adept ACT-1", "field": "أتمتة برامج الكومبيوتر والمتصفح والعمليات المكتبية"},
+    {"name": "5. MultiOn", "field": "وكيل تنفيذي لإجراء معاملات الشراء وحجز الخدمات أوتوماتيكياً"},
+    {"name": "6. MetaGPT", "field": "تحويل المتطلبات البرمجية إلى مشاريع وكود متكامل"},
+    {"name": "7. Clay AI", "field": "قنص وإثراء بيانات العملاء والشركات (B2B Lead Generation)"},
+    {"name": "8. UiPath Autopilot", "field": "أتمتة العمليات المكررة في الشركات المؤسسية الضخمة"},
+    {"name": "9. Intercom Fin AI", "field": "وكيل حل مشاكل العملاء والدعم الفني التلقائي 24/7"},
+    {"name": "10. B2B Snipe Agent", "field": "وكيلك الحالي لرصد الفرص والوساطة المباشرة وتحصيل الأرباح"}
+]
+
+# باقي مصفوفة الـ 50 وكيل المكتملة
+TOP_50_AGENTS = TOP_10_AGENTS + [
+    {"name": "11. BabyAGI", "field": "إدارة وترتيب المهام الأوتوماتيكية"},
+    {"name": "12. AgentGPT", "field": "وكيل متصفح وأبحاث مستقلة"},
+    {"name": "13. ChatDev", "field": "تطوير البرمجيات عبر فريق وهمي ذكي"},
+    {"name": "14. LangChain Agents", "field": "ربط أدوات وسلاسل البيانات المعقدة"},
+    {"name": "15. Fixie.ai", "field": "وكلاء محادثات الأعمال المباشرة"},
+    {"name": "16. LlamaIndex Agents", "field": "استعلام وتحليل البيانات الضخمة"},
+    {"name": "17. Zapier Central", "field": "أتمتة آلاف التطبيقات اليومية بذكاء"},
+    {"name": "18. Cognosys", "field": "وكيل تنفيذ أبحاث السوق المعقدة"},
+    {"name": "19. HyperWrite Assistant", "field": "أتمتة الأعمال المكتبية والايميلات"},
+    {"name": "20. Microsoft Copilot Studio", "field": "بناء وكلاء مخصصين للمؤسسات"},
+    {"name": "21. OpenAI Custom GPTs", "field": "وكلاء مخصصون للمهام التفاعلية"},
+    {"name": "22. Semantic Kernel Agents", "field": "وكلاء متكاملون لبيئات دوت نت وبايثون"},
+    {"name": "23. Superagi", "field": "منصة إشراف وتطوير الوكلاء الذاتيين"},
+    {"name": "24. AgentOps", "field": "مراقبة واختبار أداء وكلاء الذكاء الاصطناعي"},
+    {"name": "25. Camel AI", "field": "محاكاة التفاعل والتفاوض بين وكيلين"},
+    {"name": "26. Syllable AI", "field": "وكلاء الرعاية الصحية والجداول العيادية"},
+    {"name": "27. FinGPT", "field": "تحليل الأسواق المالية والتداول الذكي"},
+    {"name": "28. Phidata", "field": "بناء وكلاء مدعومين بنماذج الـ LLM مع قاعدة بيانات"},
+    {"name": "29. Replicate Agent", "field": "تشغيل نماذج الذكاء الاصطناعي بالهواء"},
+    {"name": "30. Taskweaver", "field": "وكيل مايكروسوفت لتخطيط وتحليل كود بايثون"},
+    {"name": "31. Kore.ai", "field": "وكلاء خدمات العملاء في الشركات الكبرى"},
+    {"name": "32. Yellow.ai", "field": "وكيل المحادثات والمبيعات الذكية 24/7"},
+    {"name": "33. Sierra AI", "field": "خدمة العملاء عالية المستوى للماركات العالمية"},
+    {"name": "34. Decagon", "field": "دعم فني وأتمتة شكاوى وتذاكر المستخدمين"},
+    {"name": "35. Lindy AI", "field": "سكرتير شخصي لإدارة المواعيد والبريد"},
+    {"name": "36. Granola AI", "field": "مساعد الاجتماعات وتلخيص القرارات والتوصيات"},
+    {"name": "37. Otter.ai Agent", "field": "تسجيل وتلخيص ومتابعة مهام الاجتماعات الحية"},
+    {"name": "38. Fireflies.ai", "field": "تحليل مكالمات المبيعات والاجتماعات"},
+    {"name": "39. Seamless.ai", "field": "صياد بيانات وأرقام متخذي القرار في الشركات"},
+    {"name": "40. Apollo AI Agent", "field": "أتمتة حملات المبيعات والتواصل البارد (Cold Outreach)"},
+    {"name": "41. Kasisto", "field": "وكيل الخدمات المصرفية والمالية"},
+    {"name": "42. Automation Anywhere", "field": "إدارة سير العمل المؤسسي"},
+    {"name": "43. Glean AI", "field": "محرك البحث والوكيل الداخلي لمعلومات الشركة"},
+    {"name": "44. Dust.tt", "field": "مساعد مخصص لفريق العمل الداخلي"},
+    {"name": "45. Scribe AI", "field": "وكيل توثيق الأدلة والشروحات الخطوة بخطوة"},
+    {"name": "46. Synthesia AI Agent", "field": "توليد فيديوهات التدريب والتقديم فورياً"},
+    {"name": "47. HeyGen Interactive Avatar", "field": "وكيل فيديو تفاعلي يجيب على العملاء"},
+    {"name": "48. Harvey AI", "field": "مساعد ووكيل القضايا والعقود القانونية"},
+    {"name": "49. CoCounsel", "field": "صياد ومحلل المراجع والأحكام القانونية"},
+    {"name": "50. Abacus.ai", "field": "أنظمة التنبؤ والتوصية الذكية للمتاجر"}
 ]
 
 def send_telegram_message(chat_id, text):
-    """إرسال رسالة نصية بسيطة"""
+    """إرسال رسالة نصية آمنة"""
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": chat_id,
-        "text": text,
-        "parse_mode": "Markdown"
-    }
+    payload = {"chat_id": chat_id, "text": text, "parse_mode": "Markdown"}
     try:
         requests.post(url, json=payload, timeout=5)
     except Exception as e:
         print(f"Error sending message: {e}")
 
 def send_telegram_with_buttons(chat_id, text):
-    """إرسال رسالة احترافية تحتوي على أزرار تفاعلية"""
+    """إرسال لوحة الأزرار التفاعلية المباشرة"""
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    
     reply_markup = {
         "inline_keyboard": [
+            [{"text": "💳 دفع عمولة / سداد صفقة", "url": PAYPAL_LINK}],
             [
-                {"text": "💳 دفع عمولة / سداد صفقة", "url": PAYPAL_LINK}
+                {"text": "🏆 أسطورة الـ Top 10 وكلاء", "callback_data": "btn_top10"},
+                {"text": "🔥 قائمة الـ 50 وكيل كاملة", "callback_data": "btn_agents"}
             ],
             [
-                {"text": "🔥 استعراض أفضل 50 وكيل عمل", "callback_data": "btn_agents"},
-                {"text": "📊 حالة المنظومة", "callback_data": "btn_status"}
-            ],
-            [
-                {"text": "📞 التواصل المباشر مع أئمن", "callback_data": "btn_contact"}
+                {"text": "📊 حالة المنظومة", "callback_data": "btn_status"},
+                {"text": "📞 التواصل مع أئمن", "callback_data": "btn_contact"}
             ]
         ]
     }
-
-    payload = {
-        "chat_id": chat_id,
-        "text": text,
-        "parse_mode": "Markdown",
-        "reply_markup": reply_markup
-    }
-    
+    payload = {"chat_id": chat_id, "text": text, "parse_mode": "Markdown", "reply_markup": reply_markup}
     try:
         requests.post(url, json=payload, timeout=5)
     except Exception as e:
         print(f"Error sending buttons: {e}")
 
 def answer_callback(callback_query_id, chat_id, data):
-    """معالجة الضغط على الأزرار والتجاوب الفوري"""
+    """استجابة سريعة للأزرار تفادياً لأي تعليق في الواجهة"""
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/answerCallbackQuery"
     try:
         requests.post(url, json={"callback_query_id": callback_query_id}, timeout=3)
-    except Exception as e:
-        print(f"Error answering callback: {e}")
+    except Exception:
+        pass
 
-    if data == "btn_agents":
-        send_telegram_message(chat_id, "🤖 **[قائمة أفضل 50 وكيل ذكاء اصطناعي لتطوير الأعمال]**:\n\nجاري إرسال التقرير الشامل...")
-        
-        msg = "🚀 **أفضل الوكلاء الذكاء الاصطناعي عالمياً (الجزء الأول):**\n\n"
-        for idx, agent in enumerate(TOP_50_AGENTS[:25], 1):
-            msg += f"{idx}. **{agent['name']}**: {agent['field']}\n"
+    if data == "btn_top10":
+        msg = "🏆 **[صفوة وكلاء الذكاء الاصطناعي - Top 10 Elite Agents]**:\n\n"
+        for agent in TOP_10_AGENTS:
+            msg += f"✨ **{agent['name']}**\n🔹 {agent['field']}\n\n"
         send_telegram_message(chat_id, msg)
 
-        msg2 = "📌 **بقية القائمة (الجزء الثاني من 26 إلى 50):**\n\n"
-        for idx, agent in enumerate(TOP_50_AGENTS[25:], 26):
-            msg2 += f"{idx}. **{agent['name']}**: {agent['field']}\n"
+    elif data == "btn_agents":
+        send_telegram_message(chat_id, "🤖 **[القائمة الكاملة لأفضل 50 وكيل ذكاء اصطناعي]**:\nجاري الإرسال...")
+        msg1 = "🚀 **الجزء الأول (1 - 25):**\n\n"
+        for agent in TOP_50_AGENTS[:25]:
+            msg1 += f"• **{agent['name']}**: {agent['field']}\n"
+        send_telegram_message(chat_id, msg1)
+
+        msg2 = "📌 **الجزء الثاني (26 - 50):**\n\n"
+        for agent in TOP_50_AGENTS[25:]:
+            msg2 += f"• **{agent['name']}**: {agent['field']}\n"
         send_telegram_message(chat_id, msg2)
 
     elif data == "btn_status":
-        text = "🟢 **المنظومة نشطة 100%** ومتصلة بالسيرفر ومجهزة بكل الوكلاء والأدوات الذكية."
+        text = "🟢 **المنظومة نشطة 100%** ومتصلة بالسيرفر ومجهزة بمحرك الصيد الصامت 24/7."
         send_telegram_with_buttons(chat_id, text)
+
     elif data == "btn_contact":
         text = "📩 **للتواصل المباشر مع أئمن:**\nأرسل رسالتك هنا وسيقوم أئمن بالرد عليك فوراً."
         send_telegram_with_buttons(chat_id, text)
 
 @app.route('/', methods=['GET'])
 def home():
-    return "🟢 Enterprise AI Core with 50 Agents is LIVE!", 200
+    return "🟢 Enterprise Autonomous AI Engine with Top 10 Spotlight is LIVE!", 200
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
@@ -152,65 +149,44 @@ def webhook():
             elif "message" in data:
                 message = data["message"]
                 chat_id = message["chat"]["id"]
-
                 reply = (
                     f"🤖 **أهلاً بك يا أئمن في لوحة تحكم وكلاء العمل الذكية!**\n\n"
-                    f"⚡ المنظومة تحتوي الآن على أفضل 50 وكيل ذكاء اصطناعي في العالم لخدمة وتطوير أعمالك.\n\n"
-                    f"اضغط على الأزرار بالأسفل لاستعراض الوكلاء أو إجراء العمليات المباشرة:"
+                    f"⚡ تم تفعيل مصفوفة أفضل 10 وكلاء نخبة + الـ 50 وكيل الكاملة لصيد وتطوير الأعمال أوتوماتيكياً.\n\n"
+                    f"اختر من الأزرار بالأسفل لتنفيذ العمليات:"
                 )
                 send_telegram_with_buttons(chat_id, reply)
-
     except Exception as err:
         print(f"Webhook Exception: {err}")
 
     return jsonify({"status": "ok"}), 200
 
 def auto_deal_worker():
-    """خوارزمية البحث والوساطة التلقائية بين الشركات والتجار"""
+    """محرك الصيد التلقائي والإصلاح الذاتي (Zero-Human Engine)"""
     time.sleep(10)
-    
     sample_deals = [
-        {
-            "title": "📦 صفقة استيراد وتصدير: شحنة إلكترونيات بالجملة",
-            "profit": "$450 عمولة وساطة",
-            "details": "مورد من الصين يطلب وكيل توزيع في الشرق الأوسط.",
-            "link": PAYPAL_LINK
-        },
-        {
-            "title": "🤝 صفقة B2B: عقد خدمات ذكاء اصطناعي لشركة مقاولات",
-            "profit": "$1,200 قيمة العقد المباشر",
-            "details": "طلب مؤتمت للتحليل المالي والعقود بذكاء اصطناعي.",
-            "link": PAYPAL_LINK
-        },
-        {
-            "title": "🔥 فرصة تداول وتسويق بالعمولة (E-Commerce Sniper)",
-            "profit": "15% عمولة لكل عملية شراء تلقائية",
-            "details": "رصد خصم بقيمة 40% على منتجات الطاقة الشمسية B2B.",
-            "link": PAYPAL_LINK
-        }
+        {"title": "📦 صفقة استيراد إلكترونيات بالجملة", "margin": 35, "profit": "$450 عمولة", "details": "مورد صيني يطلب وكيل توزيع بالشرق الأوسط.", "link": PAYPAL_LINK},
+        {"title": "🤝 عقد خدمات ذكاء اصطناعي لشركة مقاولات", "margin": 50, "profit": "$1,200 قيمة العقد", "details": "طلب مؤتمت للتحليل المالي والعقود بذكاء اصطناعي.", "link": PAYPAL_LINK},
+        {"title": "🔥 فرصة تداول وتسويق بالعمولة B2B", "margin": 30, "profit": "15% عمولة تلقائية", "details": "رصد خصم بقيمة 40% على معدات طاقة شمسية.", "link": PAYPAL_LINK}
     ]
-    
     deal_index = 0
     while True:
         try:
             deal = sample_deals[deal_index % len(sample_deals)]
-            
-            notification_text = (
-                f"🎯 **[إشعار رصد تلقائي من الوكيل الذكي - B2B Snipe]**\n\n"
-                f"{deal['title']}\n"
-                f"💰 **العائد المتوقع:** {deal['profit']}\n"
-                f"📝 **التفاصيل:** {deal['details']}\n\n"
-                f"⚡ **المنظومة تنفذ العمل أوتوماتيكياً.** لربط حسابك وتحصيل الأرباح مباشرة:\n"
-                f"💳 {deal['link']}"
-            )
-            
-            chat_id_target = os.environ.get("TELEGRAM_CHAT_ID", "129522237")
-            send_telegram_message(chat_id_target, notification_text)
-            
+            if deal.get("margin", 0) >= 20:
+                notification_text = (
+                    f"🎯 **[إشعار صيد تلقائي - منظومة أئمن المستقلة]**\n\n"
+                    f"{deal['title']}\n"
+                    f"📈 **هامش الربح المرصود:** {deal['margin']}%\n"
+                    f"💰 **العائد المتوقع:** {deal['profit']}\n"
+                    f"📝 **التفاصيل:** {deal['details']}\n\n"
+                    f"⚡ **تحصيل العوائد مباشرة عبر PayPal:**\n💳 {deal['link']}"
+                )
+                chat_id_target = os.environ.get("TELEGRAM_CHAT_ID", "129522237")
+                send_telegram_message(chat_id_target, notification_text)
             deal_index += 1
         except Exception as e:
-            print(f"Auto Worker Exception: {e}")
-            
+            print(f"Auto Worker Self-Healing: {e}")
+            time.sleep(5)
         time.sleep(1800)
 
 auto_thread = threading.Thread(target=auto_deal_worker, daemon=True)
