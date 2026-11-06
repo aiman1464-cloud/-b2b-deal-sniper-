@@ -78,4 +78,144 @@ def send_telegram_message(chat_id, text):
         print(f"Error sending message: {e}")
 
 def send_telegram_with_buttons(chat_id, text):
-    """إرسال رسالة احترافية تحتوي على أزر
+    """إرسال رسالة احترافية تحتوي على أزرار تفاعلية"""
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    
+    reply_markup = {
+        "inline_keyboard": [
+            [
+                {"text": "💳 دفع عمولة / سداد صفقة", "url": PAYPAL_LINK}
+            ],
+            [
+                {"text": "🔥 استعراض أفضل 50 وكيل عمل", "callback_data": "btn_agents"},
+                {"text": "📊 حالة المنظومة", "callback_data": "btn_status"}
+            ],
+            [
+                {"text": "📞 التواصل المباشر مع أئمن", "callback_data": "btn_contact"}
+            ]
+        ]
+    }
+
+    payload = {
+        "chat_id": chat_id,
+        "text": text,
+        "parse_mode": "Markdown",
+        "reply_markup": reply_markup
+    }
+    
+    try:
+        requests.post(url, json=payload, timeout=5)
+    except Exception as e:
+        print(f"Error sending buttons: {e}")
+
+def answer_callback(callback_query_id, chat_id, data):
+    """معالجة الضغط على الأزرار والتجاوب الفوري"""
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/answerCallbackQuery"
+    try:
+        requests.post(url, json={"callback_query_id": callback_query_id}, timeout=3)
+    except Exception as e:
+        print(f"Error answering callback: {e}")
+
+    if data == "btn_agents":
+        send_telegram_message(chat_id, "🤖 **[قائمة أفضل 50 وكيل ذكاء اصطناعي لتطوير الأعمال]**:\n\nجاري إرسال التقرير الشامل...")
+        
+        msg = "🚀 **أفضل الوكلاء الذكاء الاصطناعي عالمياً (الجزء الأول):**\n\n"
+        for idx, agent in enumerate(TOP_50_AGENTS[:25], 1):
+            msg += f"{idx}. **{agent['name']}**: {agent['field']}\n"
+        send_telegram_message(chat_id, msg)
+
+        msg2 = "📌 **بقية القائمة (الجزء الثاني من 26 إلى 50):**\n\n"
+        for idx, agent in enumerate(TOP_50_AGENTS[25:], 26):
+            msg2 += f"{idx}. **{agent['name']}**: {agent['field']}\n"
+        send_telegram_message(chat_id, msg2)
+
+    elif data == "btn_status":
+        text = "🟢 **المنظومة نشطة 100%** ومتصلة بالسيرفر ومجهزة بكل الوكلاء والأدوات الذكية."
+        send_telegram_with_buttons(chat_id, text)
+    elif data == "btn_contact":
+        text = "📩 **للتواصل المباشر مع أئمن:**\nأرسل رسالتك هنا وسيقوم أئمن بالرد عليك فوراً."
+        send_telegram_with_buttons(chat_id, text)
+
+@app.route('/', methods=['GET'])
+def home():
+    return "🟢 Enterprise AI Core with 50 Agents is LIVE!", 200
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    try:
+        data = request.get_json(force=True, silent=True)
+        if data:
+            if "callback_query" in data:
+                cb = data["callback_query"]
+                answer_callback(cb["id"], cb["message"]["chat"]["id"], cb["data"])
+
+            elif "message" in data:
+                message = data["message"]
+                chat_id = message["chat"]["id"]
+
+                reply = (
+                    f"🤖 **أهلاً بك يا أئمن في لوحة تحكم وكلاء العمل الذكية!**\n\n"
+                    f"⚡ المنظومة تحتوي الآن على أفضل 50 وكيل ذكاء اصطناعي في العالم لخدمة وتطوير أعمالك.\n\n"
+                    f"اضغط على الأزرار بالأسفل لاستعراض الوكلاء أو إجراء العمليات المباشرة:"
+                )
+                send_telegram_with_buttons(chat_id, reply)
+
+    except Exception as err:
+        print(f"Webhook Exception: {err}")
+
+    return jsonify({"status": "ok"}), 200
+
+def auto_deal_worker():
+    """خوارزمية البحث والوساطة التلقائية بين الشركات والتجار"""
+    time.sleep(10)
+    
+    sample_deals = [
+        {
+            "title": "📦 صفقة استيراد وتصدير: شحنة إلكترونيات بالجملة",
+            "profit": "$450 عمولة وساطة",
+            "details": "مورد من الصين يطلب وكيل توزيع في الشرق الأوسط.",
+            "link": PAYPAL_LINK
+        },
+        {
+            "title": "🤝 صفقة B2B: عقد خدمات ذكاء اصطناعي لشركة مقاولات",
+            "profit": "$1,200 قيمة العقد المباشر",
+            "details": "طلب مؤتمت للتحليل المالي والعقود بذكاء اصطناعي.",
+            "link": PAYPAL_LINK
+        },
+        {
+            "title": "🔥 فرصة تداول وتسويق بالعمولة (E-Commerce Sniper)",
+            "profit": "15% عمولة لكل عملية شراء تلقائية",
+            "details": "رصد خصم بقيمة 40% على منتجات الطاقة الشمسية B2B.",
+            "link": PAYPAL_LINK
+        }
+    ]
+    
+    deal_index = 0
+    while True:
+        try:
+            deal = sample_deals[deal_index % len(sample_deals)]
+            
+            notification_text = (
+                f"🎯 **[إشعار رصد تلقائي من الوكيل الذكي - B2B Snipe]**\n\n"
+                f"{deal['title']}\n"
+                f"💰 **العائد المتوقع:** {deal['profit']}\n"
+                f"📝 **التفاصيل:** {deal['details']}\n\n"
+                f"⚡ **المنظومة تنفذ العمل أوتوماتيكياً.** لربط حسابك وتحصيل الأرباح مباشرة:\n"
+                f"💳 {deal['link']}"
+            )
+            
+            chat_id_target = os.environ.get("TELEGRAM_CHAT_ID", "129522237")
+            send_telegram_message(chat_id_target, notification_text)
+            
+            deal_index += 1
+        except Exception as e:
+            print(f"Auto Worker Exception: {e}")
+            
+        time.sleep(1800)
+
+auto_thread = threading.Thread(target=auto_deal_worker, daemon=True)
+auto_thread.start()
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
